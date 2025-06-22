@@ -172,7 +172,7 @@
       ],
       "fieldTypes": {
         "title": "string",
-        "faqItems": "array of FAQ item references"
+        "faqItems": "array of faqItem objects"
       },
       "description": "Container for a list of FAQ items"
     },

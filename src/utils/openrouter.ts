@@ -421,230 +421,532 @@ function _toPlainString(value: any): string {
 • COMPREHENSIVE coverage of all known validation issues
 ─────────────────────────────────────────────────────────────────────────*/
 function applyAutoFixes(contentBlocks: any[], schema: any): any[] {
-  console.log('🔧 === AUTO-FIX SYSTEM STARTING ===');
+  console.log('🔧 === BULLETPROOF AUTO-FIX SYSTEM STARTING ===');
   console.log(`📋 Processing ${contentBlocks.length} content blocks`);
   
-  // HARDCODED field mappings based on actual schema analysis
-  // These fields expect simple strings, not Portable Text arrays
-  const STRING_FIELDS_MAP: Record<string, string[]> = {
-    'renewableEnergyForecast': ['leadingText'],
-    'monthlyProductionChart': ['leadingText'], 
-    'realPriceComparisonTable': ['leadingText'],
-    'priceExampleTable': [], // leadingText here is actually array of blocks (correct)
-    'hero': ['headline', 'subheadline'],
-    'pageSection': ['title'],
-    'featureList': ['title'],
-    'featureItem': ['title', 'description'],
-    'valueProposition': ['title'],
-    'providerList': ['title'],
-    'livePriceGraph': ['title', 'subtitle'],
-    'videoSection': ['title'],
-    'faqItem': ['question'],
-    'callToActionSection': ['title', 'buttonText', 'buttonUrl'],
-  };
+  // Extract schema field type information for bulletproof validation
+  const schemaFieldTypes = extractSchemaFieldTypes(schema);
+  const referenceOnlyFields = extractReferenceOnlyFields(schema);
+  
+  console.log(`📊 Schema analysis: ${Object.keys(schemaFieldTypes).length} block types, ${Object.keys(referenceOnlyFields).length} reference-only field mappings`);
 
   let totalFixesApplied = 0;
+  let totalViolationsDetected = 0;
+  let totalObjectsDropped = 0;
 
   const fixedBlocks = contentBlocks.map((blk: any, idx: number) => {
-    const b = { ...blk }; // Shallow copy for mutation
+    if (!blk || typeof blk !== 'object') {
+      console.warn(`⚠️  Block ${idx}: Invalid block object, skipping`);
+      totalViolationsDetected++;
+      return null;
+    }
+
+    const b = JSON.parse(JSON.stringify(blk)); // Deep copy for safe mutation
     let blockFixesApplied = 0;
+    let blockViolationsDetected = 0;
     
-    console.log(`\n🔍 Block ${idx}: ${b._type}`);
+    console.log(`\n🔍 Block ${idx}: ${b._type || 'UNKNOWN_TYPE'}`);
+
+    /* ========== BLOCK TYPE VALIDATION ========== */
+    
+    if (!b._type || typeof b._type !== 'string') {
+      console.error(`❌ Block ${idx}: Missing or invalid _type, dropping block`);
+      totalViolationsDetected++;
+      totalObjectsDropped++;
+      return null;
+    }
+
+    if (!schemaFieldTypes[b._type]) {
+      console.warn(`⚠️  Block ${idx}: Unknown block type '${b._type}', attempting to fix anyway`);
+      blockViolationsDetected++;
+    }
 
     /* ========== UNIVERSAL SAFEGUARDS ========== */
     
-    // 1. Ensure _key exists
-    if (!b._key) {
+    // 1. Ensure _key exists and is valid
+    if (!b._key || typeof b._key !== 'string' || b._key.trim() === '') {
       const newKey = `${b._type}-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
       b._key = newKey;
-      console.log(`  ✅ Added _key: ${newKey}`);
+      console.log(`  ✅ Added/fixed _key: ${newKey}`);
       blockFixesApplied++;
     }
 
-    // 2. Remove problematic icon fields
-    if (b.icon && typeof b.icon === 'string') {
-      delete b.icon;
-      console.log(`  ✅ Removed string icon field`);
-      blockFixesApplied++;
-    }
-    if (b._type === 'featureItem' && 'icon' in b) {
-      delete b.icon;
-      console.log(`  ✅ Removed featureItem icon field`);
-      blockFixesApplied++;
-    }
+    // 2. Remove ALL problematic icon fields (bulletproof approach)
+    const iconFieldsRemoved = removeProblematicFields(b, ['icon'], `Block ${idx}`);
+    blockFixesApplied += iconFieldsRemoved;
 
-    // 3. Remove customThumbnail from videoSection
+    // 3. Remove customThumbnail from videoSection (can cause validation errors)
     if (b._type === 'videoSection' && 'customThumbnail' in b) {
       delete b.customThumbnail;
-      console.log(`  ✅ Removed videoSection customThumbnail`);
+      console.log(`  ✅ Removed videoSection customThumbnail (validation risk)`);
       blockFixesApplied++;
     }
 
-    /* ========== STRING FIELD FLATTENING ========== */
+    /* ========== FIELD TYPE ENFORCEMENT ========== */
     
-    const stringFields = STRING_FIELDS_MAP[b._type] || [];
-    stringFields.forEach(field => {
-      if (field in b && Array.isArray(b[field])) {
-        const originalValue = JSON.stringify(b[field]).substring(0, 100) + '...';
-        const flattened = _toPlainString(b[field]);
-        b[field] = flattened;
-        console.log(`  ✅ Flattened ${field}: "${flattened.substring(0, 50)}..."`);
-        console.log(`     Was: ${originalValue}`);
+    const blockSchema = schemaFieldTypes[b._type] || {};
+    
+    Object.keys(b).forEach(fieldName => {
+      if (fieldName.startsWith('_')) return; // Skip Sanity system fields
+      
+      const expectedType = blockSchema[fieldName];
+      const currentValue = b[fieldName];
+      
+      if (!expectedType) {
+        // Unknown field - log but don't remove (might be valid)
+        console.log(`  ℹ️  Unknown field '${fieldName}' in ${b._type}, keeping as-is`);
+        return;
+      }
+      
+      const fixResult = enforceFieldType(fieldName, currentValue, expectedType, b._type, idx);
+      if (fixResult.fixed) {
+        b[fieldName] = fixResult.value;
+        console.log(`  ✅ Fixed ${fieldName}: ${expectedType} (was ${fixResult.wasType})`);
         blockFixesApplied++;
+      } else if (fixResult.dropped) {
+        delete b[fieldName];
+        console.warn(`  ⚠️  Dropped ${fieldName}: unfixable type mismatch (${fixResult.wasType} vs ${expectedType})`);
+        blockFixesApplied++;
+        blockViolationsDetected++;
       }
     });
 
-    /* ========== FAQ GROUP SANITIZATION ========== */
+    /* ========== REFERENCE-ONLY ARRAY VALIDATION ========== */
     
+    const referenceFields = referenceOnlyFields[b._type] || [];
+    referenceFields.forEach(fieldName => {
+      if (!(fieldName in b)) return;
+      
+      const fixResult = sanitizeReferenceOnlyArray(b[fieldName], `${b._type}.${fieldName}`, idx);
+      if (fixResult.fixed) {
+        b[fieldName] = fixResult.value;
+        console.log(`  ✅ Sanitized reference array ${fieldName}: ${fixResult.originalCount} → ${fixResult.validCount} valid refs`);
+        blockFixesApplied++;
+        if (fixResult.droppedCount > 0) {
+          console.warn(`  ⚠️  Dropped ${fixResult.droppedCount} invalid objects from ${fieldName}`);
+          blockViolationsDetected++;
+          totalObjectsDropped += fixResult.droppedCount;
+        }
+      }
+    });
+
+    /* ========== SPECIAL CASE HANDLING ========== */
+    
+    // FAQ Groups: Must have valid faqItems array
     if (b._type === 'faqGroup') {
-      const originalCount = b.faqItems?.length || 0;
-      b.faqItems = (b.faqItems || []).filter((it: any) => it?._type === 'faqItem');
-      
-      if (b.faqItems.length !== originalCount) {
-        console.log(`  ✅ Filtered faqItems: ${originalCount} → ${b.faqItems.length} (removed references)`);
-        blockFixesApplied++;
-      }
-      
-      if (!b.faqItems.length) {
-        b.faqItems = [{
-          _type: 'faqItem',
-          _key: `faq-${Date.now()}`,
-          question: 'Placeholder question',
-          answer: [{
-            _type: 'block',
-            _key: `answer-${Date.now()}`,
-            style: 'normal',
-            children: [{ _type: 'span', _key: `span-${Date.now()}`, text: 'Placeholder answer', marks: [] }],
-            markDefs: []
-          }]
-        }];
-        console.log(`  ✅ Added placeholder faqItem (was empty)`);
-        blockFixesApplied++;
-      }
+      const faqFixResult = fixFaqGroup(b, idx);
+      blockFixesApplied += faqFixResult.fixesApplied;
+      blockViolationsDetected += faqFixResult.violationsDetected;
     }
 
-    /* ========== PROVIDER LIST VALIDATION ========== */
-    
+    // Provider Lists: Must have valid provider references
     if (b._type === 'providerList') {
-      const needsfix = !Array.isArray(b.providers) ||
-        b.providers.length === 0 ||
-        b.providers.some((p: any, i: number) =>
-          typeof p !== 'object' || p._type !== 'reference' || !p._ref ||
-          !isValidProviderId(p._ref) || (i === 0 && p._ref !== PROVIDER_WHITELIST[0])
-        );
+      const providerFixResult = fixProviderList(b, idx);
+      blockFixesApplied += providerFixResult.fixesApplied;
+      blockViolationsDetected += providerFixResult.violationsDetected;
+    }
+
+    // Value Propositions: Clean nested objects
+    if (b._type === 'valueProposition' && Array.isArray(b.items)) {
+      const cleanedItems = b.items.map((item: any, itemIdx: number) => {
+        if (!item || typeof item !== 'object') return null;
+        const cleaned = { ...item };
+        const removed = removeProblematicFields(cleaned, ['icon'], `valueProposition.items[${itemIdx}]`);
+        blockFixesApplied += removed;
+        return cleaned;
+      }).filter(Boolean);
       
-      if (needsfix) {
-        const n = Math.min(4, PROVIDER_WHITELIST.length);
-        b.providers = PROVIDER_WHITELIST.slice(0, n).map(id => ({ _type: 'reference', _ref: id }));
-        console.log(`  ✅ Fixed providers array with ${n} whitelisted refs`);
+      if (cleanedItems.length !== b.items.length) {
+        console.warn(`  ⚠️  Cleaned valueProposition.items: ${b.items.length} → ${cleanedItems.length}`);
+        b.items = cleanedItems;
         blockFixesApplied++;
       }
     }
 
-    /* ========== DEEP NESTED FIXES ========== */
-    
-    // Fix nested objects that might have string fields needing flattening
-    if (b._type === 'valueProposition' && Array.isArray(b.items)) {
-      b.items.forEach((item: any, itemIdx: number) => {
-        if (item.icon && typeof item.icon === 'string') {
-          delete item.icon;
-          console.log(`  ✅ Removed icon from valueProposition item ${itemIdx}`);
-          blockFixesApplied++;
-        }
-      });
-    }
-
+    // Feature Lists: Clean nested objects
     if (b._type === 'featureList' && Array.isArray(b.features)) {
-      b.features.forEach((feature: any, featIdx: number) => {
-        if (feature.icon && typeof feature.icon === 'string') {
-          delete feature.icon;
-          console.log(`  ✅ Removed icon from feature ${featIdx}`);
-          blockFixesApplied++;
-        }
-      });
+      const cleanedFeatures = b.features.map((feature: any, featIdx: number) => {
+        if (!feature || typeof feature !== 'object') return null;
+        const cleaned = { ...feature };
+        const removed = removeProblematicFields(cleaned, ['icon'], `featureList.features[${featIdx}]`);
+        blockFixesApplied += removed;
+        return cleaned;
+      }).filter(Boolean);
+      
+      if (cleanedFeatures.length !== b.features.length) {
+        console.warn(`  ⚠️  Cleaned featureList.features: ${b.features.length} → ${cleanedFeatures.length}`);
+        b.features = cleanedFeatures;
+        blockFixesApplied++;
+      }
     }
 
-    console.log(`  📊 Block fixes applied: ${blockFixesApplied}`);
+    console.log(`  📊 Block fixes: ${blockFixesApplied}, violations: ${blockViolationsDetected}`);
     totalFixesApplied += blockFixesApplied;
+    totalViolationsDetected += blockViolationsDetected;
     return b;
-  });
+  }).filter(Boolean); // Remove any null blocks
 
-  /* ========== REFERENCE SANITIZATION ========== */
+  /* ========== DEEP REFERENCE SANITIZATION ========== */
   
-  // Recursively sanitize all reference objects to ensure schema compliance
-  function sanitizeReferences(obj: any, path: string = ''): number {
-    let sanitizedCount = 0;
-    
-    if (typeof obj !== 'object' || obj === null) {
-      return sanitizedCount;
-    }
-    
-    // Handle arrays
-    if (Array.isArray(obj)) {
-      obj.forEach((item, index) => {
-        sanitizedCount += sanitizeReferences(item, `${path}[${index}]`);
-      });
-      return sanitizedCount;
-    }
-    
-    // Check if this object is a reference (has _ref or _type === 'reference')
-    if (obj._ref || obj._type === 'reference') {
-      const allowedKeys = ['_type', '_ref', '_key', '_weak'];
-      const originalKeys = Object.keys(obj);
-      const invalidKeys = originalKeys.filter(key => !allowedKeys.includes(key));
-      
-      if (invalidKeys.length > 0) {
-        invalidKeys.forEach(key => delete obj[key]);
-        console.warn(`🧹 Sanitized reference at ${path || 'root'}: removed invalid keys [${invalidKeys.join(', ')}]`);
-        sanitizedCount++;
-      }
-      
-      // Ensure _type is set to 'reference' if _ref exists
-      if (obj._ref && obj._type !== 'reference') {
-        obj._type = 'reference';
-        console.log(`  ✅ Fixed reference _type at ${path || 'root'}`);
-        sanitizedCount++;
-      }
-    } else {
-      // Recursively check nested objects
-      Object.keys(obj).forEach(key => {
-        sanitizedCount += sanitizeReferences(obj[key], path ? `${path}.${key}` : key);
-      });
-    }
-    
-    return sanitizedCount;
-  }
-  
-  // Apply reference sanitization to all blocks
   let totalReferencesSanitized = 0;
   fixedBlocks.forEach((block, idx) => {
-    const sanitizedInBlock = sanitizeReferences(block, `block[${idx}]`);
+    const sanitizedInBlock = sanitizeAllReferences(block, `block[${idx}]`);
     totalReferencesSanitized += sanitizedInBlock;
   });
-  
-  if (totalReferencesSanitized > 0) {
-    console.log(`🧹 Reference sanitization: cleaned ${totalReferencesSanitized} reference objects`);
-  }
 
-  console.log(`\n🎯 === AUTO-FIX SYSTEM COMPLETE ===`);
+  console.log(`\n🎯 === BULLETPROOF AUTO-FIX SYSTEM COMPLETE ===`);
   console.log(`📈 Total fixes applied: ${totalFixesApplied}`);
+  console.log(`⚠️  Total violations detected: ${totalViolationsDetected}`);
+  console.log(`🗑️  Total objects dropped: ${totalObjectsDropped}`);
   console.log(`🧹 References sanitized: ${totalReferencesSanitized}`);
-  console.log(`📋 Blocks processed: ${fixedBlocks.length}`);
+  console.log(`📋 Blocks processed: ${contentBlocks.length} → ${fixedBlocks.length} (${contentBlocks.length - fixedBlocks.length} dropped)`);
   
-  // MUTATION VERIFICATION: Log a sample of fixed blocks for debugging
-  if (totalFixesApplied > 0) {
-    console.log('\n🔍 SAMPLE FIXED BLOCKS:');
-    fixedBlocks.slice(0, 2).forEach((block, idx) => {
-      console.log(`Block ${idx} (${block._type}):`, {
-        _key: block._key,
-        hasLeadingText: 'leadingText' in block,
-        leadingTextType: typeof block.leadingText,
-        leadingTextSample: typeof block.leadingText === 'string' ? block.leadingText.substring(0, 50) + '...' : 'N/A'
-      });
+  // COMPREHENSIVE DEBUGGING OUTPUT
+  if (totalFixesApplied > 0 || totalViolationsDetected > 0) {
+    console.log('\n🔍 DETAILED FIX SUMMARY:');
+    fixedBlocks.slice(0, 3).forEach((block, idx) => {
+      const debugInfo: any = {
+        _type: block._type,
+        _key: block._key?.substring(0, 20) + '...',
+        fields: Object.keys(block).filter(k => !k.startsWith('_')).length,
+      };
+      
+      // Check for common problem fields
+      if ('leadingText' in block) {
+        debugInfo.leadingText = {
+          type: Array.isArray(block.leadingText) ? 'array' : typeof block.leadingText,
+          sample: typeof block.leadingText === 'string' ? 
+            block.leadingText.substring(0, 30) + '...' : 
+            `[${Array.isArray(block.leadingText) ? block.leadingText.length + ' items' : 'non-string'}]`
+        };
+      }
+      
+      if ('providers' in block) {
+        debugInfo.providers = {
+          count: Array.isArray(block.providers) ? block.providers.length : 'not-array',
+          allReferences: Array.isArray(block.providers) ? 
+            block.providers.every((p: any) => p?._type === 'reference' && p?._ref) : false
+        };
+      }
+      
+      if ('faqItems' in block) {
+        debugInfo.faqItems = {
+          count: Array.isArray(block.faqItems) ? block.faqItems.length : 'not-array',
+          allReferences: Array.isArray(block.faqItems) ? 
+            block.faqItems.every((f: any) => f?._type === 'reference' && f?._ref) : false
+        };
+      }
+      
+      console.log(`Block ${idx}:`, debugInfo);
     });
   }
 
   return fixedBlocks;
+}
+
+// Helper function to extract field types from schema manifest
+function extractSchemaFieldTypes(schema: any): Record<string, Record<string, string>> {
+  const fieldTypes: Record<string, Record<string, string>> = {};
+  
+  if (schema?.contentBlockTypes && Array.isArray(schema.contentBlockTypes)) {
+    schema.contentBlockTypes.forEach((blockType: any) => {
+      if (blockType.type && blockType.fieldTypes) {
+        fieldTypes[blockType.type] = { ...blockType.fieldTypes };
+      }
+    });
+  }
+  
+  return fieldTypes;
+}
+
+// Helper function to extract reference-only field mappings from schema
+function extractReferenceOnlyFields(schema: any): Record<string, string[]> {
+  const referenceFields: Record<string, string[]> = {};
+  
+  if (schema?.contentBlockTypes && Array.isArray(schema.contentBlockTypes)) {
+    schema.contentBlockTypes.forEach((blockType: any) => {
+      const refFields: string[] = [];
+      
+      if (blockType.fieldTypes) {
+        Object.entries(blockType.fieldTypes).forEach(([fieldName, fieldType]) => {
+          if (typeof fieldType === 'string' && 
+              (fieldType.includes('references') || fieldType.includes('reference'))) {
+            refFields.push(fieldName);
+          }
+        });
+      }
+      
+      if (refFields.length > 0) {
+        referenceFields[blockType.type] = refFields;
+      }
+    });
+  }
+  
+  return referenceFields;
+}
+
+// Helper function to enforce field type compliance
+function enforceFieldType(fieldName: string, value: any, expectedType: string, blockType: string, blockIndex: number): 
+  { fixed: boolean; dropped: boolean; value?: any; wasType: string } {
+  
+  const wasType = Array.isArray(value) ? 'array' : typeof value;
+  
+  // String fields that might be arrays (Portable Text)
+  if (expectedType === 'string') {
+    if (Array.isArray(value)) {
+      // Try to flatten Portable Text to string
+      const flattened = _toPlainString(value);
+      if (flattened && flattened.trim() !== '') {
+        return { fixed: true, dropped: false, value: flattened, wasType };
+      } else {
+        return { fixed: false, dropped: true, wasType };
+      }
+    } else if (typeof value === 'string') {
+      return { fixed: false, dropped: false, wasType }; // Already correct
+    } else if (value != null) {
+      // Try to convert other types to string
+      return { fixed: true, dropped: false, value: String(value), wasType };
+    } else {
+      return { fixed: false, dropped: true, wasType };
+    }
+  }
+  
+  // Array fields that might be strings or wrong type
+  if (expectedType.includes('array')) {
+    if (!Array.isArray(value)) {
+      if (typeof value === 'string' && expectedType.includes('Portable Text')) {
+        // Convert string to Portable Text block
+        const portableTextBlock = {
+          _type: 'block',
+          _key: `block-${Date.now()}-${Math.random().toString(36).slice(2,4)}`,
+          style: 'normal',
+          children: [{
+            _type: 'span',
+            _key: `span-${Date.now()}-${Math.random().toString(36).slice(2,4)}`,
+            text: value,
+            marks: []
+          }],
+          markDefs: []
+        };
+        return { fixed: true, dropped: false, value: [portableTextBlock], wasType };
+      } else if (expectedType.includes('strings')) {
+        // Convert single value to array of strings
+        return { fixed: true, dropped: false, value: [String(value)], wasType };
+      } else {
+        return { fixed: false, dropped: true, wasType };
+      }
+    } else {
+      return { fixed: false, dropped: false, wasType }; // Already array
+    }
+  }
+  
+  // Number fields
+  if (expectedType === 'number') {
+    if (typeof value === 'number') {
+      return { fixed: false, dropped: false, wasType };
+    } else if (typeof value === 'string' && !isNaN(Number(value))) {
+      return { fixed: true, dropped: false, value: Number(value), wasType };
+    } else {
+      return { fixed: false, dropped: true, wasType };
+    }
+  }
+  
+  // Default: no fix needed or possible
+  return { fixed: false, dropped: false, wasType };
+}
+
+// Helper function to sanitize reference-only arrays
+function sanitizeReferenceOnlyArray(value: any, fieldPath: string, blockIndex: number): 
+  { fixed: boolean; value?: any[]; originalCount: number; validCount: number; droppedCount: number } {
+  
+  if (!Array.isArray(value)) {
+    return { fixed: false, originalCount: 0, validCount: 0, droppedCount: 0 };
+  }
+  
+  const originalCount = value.length;
+  const validReferences: any[] = [];
+  let droppedCount = 0;
+  
+  value.forEach((item, idx) => {
+    if (!item || typeof item !== 'object') {
+      console.warn(`  ⚠️  ${fieldPath}[${idx}]: Not an object, dropping`);
+      droppedCount++;
+      return;
+    }
+    
+    // Strictly require proper reference shape
+    if (item._type === 'reference' && typeof item._ref === 'string' && item._ref.trim() !== '') {
+      const cleanRef: any = { _type: 'reference', _ref: item._ref };
+      if (item._key) cleanRef._key = item._key;
+      if (item._weak) cleanRef._weak = item._weak;
+      validReferences.push(cleanRef);
+    } else if (item._ref && typeof item._ref === 'string') {
+      // Has _ref but missing/incorrect _type – fix _type
+      const cleanRef: any = { _type: 'reference', _ref: item._ref };
+      if (item._key) cleanRef._key = item._key;
+      if (item._weak) cleanRef._weak = item._weak;
+      validReferences.push(cleanRef);
+      console.log(`  ✅ Fixed reference _type in ${fieldPath}[${idx}]`);
+    } else {
+      // Inline object or invalid reference – drop it
+      console.warn(`  ⚠️  ${fieldPath}[${idx}]: Inline or invalid object dropped (type=${item._type || typeof item})`);
+      droppedCount++;
+    }
+  });
+  
+  return {
+    fixed: validReferences.length !== originalCount || droppedCount > 0,
+    value: validReferences,
+    originalCount,
+    validCount: validReferences.length,
+    droppedCount
+  };
+}
+
+// Helper function to remove problematic fields
+function removeProblematicFields(obj: any, fieldsToRemove: string[], context: string): number {
+  let removed = 0;
+  fieldsToRemove.forEach(field => {
+    if (field in obj) {
+      delete obj[field];
+      console.log(`  ✅ Removed ${field} from ${context}`);
+      removed++;
+    }
+  });
+  return removed;
+}
+
+// Helper function to fix FAQ groups
+function fixFaqGroup(block: any, blockIndex: number): { fixesApplied: number; violationsDetected: number } {
+  let fixesApplied = 0;
+  let violationsDetected = 0;
+
+  if (!Array.isArray(block.faqItems)) {
+    block.faqItems = [];
+    fixesApplied++;
+  }
+
+  const originalCount = block.faqItems.length;
+
+  // Keep only VALID inline faqItem objects, drop references and invalid entries
+  block.faqItems = (block.faqItems as any[]).filter((item, idx) => {
+    if (!item || typeof item !== 'object') {
+      console.warn(`  ⚠️  faqGroup.faqItems[${idx}]: Not an object – dropped`);
+      violationsDetected++;
+      return false;
+    }
+    if (item._type === 'faqItem' && typeof item.question === 'string' && Array.isArray(item.answer)) {
+      return true; // valid inline object
+    }
+    console.warn(`  ⚠️  faqGroup.faqItems[${idx}]: Invalid or reference – dropped`);
+    violationsDetected++;
+    return false;
+  });
+
+  if (block.faqItems.length !== originalCount) {
+    console.log(`  ✅ Sanitized faqItems: ${originalCount} → ${block.faqItems.length}`);
+    fixesApplied++;
+  }
+
+  // Guarantee at least one inline faqItem because schema validation requires min(1)
+  if (block.faqItems.length === 0) {
+    const ts = Date.now();
+    const newKey = `faq-${ts}-${Math.random().toString(36).slice(2,4)}`;
+    block.faqItems.push({
+      _type: 'faqItem',
+      _key: newKey,
+      question: 'Placeholder spørgsmål',
+      answer: [{
+        _type: 'block',
+        _key: `block-${ts}`,
+        style: 'normal',
+        children: [{ _type: 'span', _key: `span-${ts}`, text: 'FAQ-indhold mangler.', marks: [] }],
+        markDefs: []
+      }]
+    });
+    console.warn('⚠️  Added placeholder inline faqItem due to empty faqItems array');
+    fixesApplied++;
+  }
+
+  return { fixesApplied, violationsDetected };
+}
+
+// Helper function to fix provider lists
+function fixProviderList(block: any, blockIndex: number): { fixesApplied: number; violationsDetected: number } {
+  let fixesApplied = 0;
+  let violationsDetected = 0;
+  
+  const needsfix = !Array.isArray(block.providers) ||
+    block.providers.length === 0 ||
+    block.providers.some((p: any, i: number) =>
+      typeof p !== 'object' || p._type !== 'reference' || !p._ref ||
+      !isValidProviderId(p._ref) || (i === 0 && p._ref !== PROVIDER_WHITELIST[0])
+    );
+  
+  if (needsfix) {
+    const n = Math.min(4, PROVIDER_WHITELIST.length);
+    block.providers = PROVIDER_WHITELIST.slice(0, n).map(id => ({ 
+      _type: 'reference', 
+      _ref: id,
+      _key: `provider-${Date.now()}-${Math.random().toString(36).slice(2,4)}`
+    }));
+    console.log(`  ✅ Fixed providers array with ${n} whitelisted refs`);
+    fixesApplied++;
+    if (block.providers.length === 0) violationsDetected++;
+  }
+  
+  return { fixesApplied, violationsDetected };
+}
+
+// Enhanced reference sanitization with comprehensive logging
+function sanitizeAllReferences(obj: any, path: string = ''): number {
+  let sanitizedCount = 0;
+  
+  if (typeof obj !== 'object' || obj === null) {
+    return sanitizedCount;
+  }
+  
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index) => {
+      sanitizedCount += sanitizeAllReferences(item, `${path}[${index}]`);
+    });
+    return sanitizedCount;
+  }
+  
+  // Check if this object is a reference (has _ref or _type === 'reference')
+  if (obj._ref || obj._type === 'reference') {
+    const allowedKeys = ['_type', '_ref', '_key', '_weak'];
+    const originalKeys = Object.keys(obj);
+    const invalidKeys = originalKeys.filter(key => !allowedKeys.includes(key));
+    
+    if (invalidKeys.length > 0) {
+      invalidKeys.forEach(key => delete obj[key]);
+      console.log(`  🧹 Sanitized reference at ${path || 'root'}: removed [${invalidKeys.join(', ')}]`);
+      sanitizedCount++;
+    }
+    
+    // Ensure _type is set to 'reference' if _ref exists
+    if (obj._ref && obj._type !== 'reference') {
+      obj._type = 'reference';
+      console.log(`  ✅ Fixed reference _type at ${path || 'root'}`);
+      sanitizedCount++;
+    }
+    
+    // Validate _ref is a string
+    if (obj._ref && typeof obj._ref !== 'string') {
+      console.warn(`  ⚠️  Invalid _ref type at ${path || 'root'}: ${typeof obj._ref}`);
+      delete obj._ref;
+      sanitizedCount++;
+    }
+  } else {
+    // Recursively check nested objects
+    Object.keys(obj).forEach(key => {
+      sanitizedCount += sanitizeAllReferences(obj[key], path ? `${path}.${key}` : key);
+    });
+  }
+  
+  return sanitizedCount;
 }
 
 /**
@@ -811,11 +1113,84 @@ IMPORTANT: Respond with valid JSON only. No markdown code blocks, no explanation
     const content = response.data.choices[0].message.content;
     
     /* ---------- parse + fix + validate ---------- */
+    console.log('🔍 RAW AI RESPONSE PREVIEW:', content.slice(0, 500));
+    console.log('📏 Full response length:', content.length, 'characters');
+    
     let parsed: any;
+    let jsonExtractionAttempts = 0;
+    let successfulStrategy = '';
+    
+    // Attempt 1: Direct JSON parse
     try {
       parsed = JSON.parse(content);
-    } catch {
-      parsed = { contentBlocks: [] };  // fallback – will be wrapped later
+      successfulStrategy = 'DIRECT_PARSE';
+      console.log('✅ JSON parse succeeded via [DIRECT_PARSE]');
+    } catch (directParseError) {
+      jsonExtractionAttempts++;
+      console.log('⚠️  Strategy [DIRECT_PARSE] failed:', (directParseError as Error).message.substring(0, 100));
+      
+      // Attempt 2: Extract JSON from markdown code blocks
+      const codeBlockMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/i);
+      if (codeBlockMatch) {
+        try {
+          parsed = JSON.parse(codeBlockMatch[1]);
+          successfulStrategy = 'MARKDOWN_EXTRACTION';
+          console.log('✅ JSON parse succeeded via [MARKDOWN_EXTRACTION]');
+          console.log('📦 Extracted from code block, length:', codeBlockMatch[1].length);
+        } catch (codeBlockError) {
+          jsonExtractionAttempts++;
+          console.log('⚠️  Strategy [MARKDOWN_EXTRACTION] failed:', (codeBlockError as Error).message.substring(0, 100));
+        }
+      } else {
+        console.log('⚠️  Strategy [MARKDOWN_EXTRACTION] skipped: No code blocks found');
+      }
+      
+      // Attempt 3: Find JSON object boundaries in text
+      if (!parsed) {
+        const jsonMatch = content.match(/\{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*\}/);
+        if (jsonMatch) {
+          try {
+            parsed = JSON.parse(jsonMatch[0]);
+            successfulStrategy = 'BOUNDARY_DETECTION';
+            console.log('✅ JSON parse succeeded via [BOUNDARY_DETECTION]');
+            console.log('📦 Extracted JSON length:', jsonMatch[0].length);
+          } catch (boundaryError) {
+            jsonExtractionAttempts++;
+            console.log('⚠️  Strategy [BOUNDARY_DETECTION] failed:', (boundaryError as Error).message.substring(0, 100));
+          }
+        } else {
+          console.log('⚠️  Strategy [BOUNDARY_DETECTION] skipped: No JSON boundaries found');
+        }
+      }
+      
+      // Attempt 4: Clean and retry (remove common issues)
+      if (!parsed) {
+        try {
+          const cleaned = content
+            .replace(/```(?:json)?/gi, '') // Remove markdown
+            .replace(/^\s*[\w\s]*?(?=\{)/, '') // Remove text before first {
+            .replace(/\}[\s\w]*$/, '}') // Remove text after last }
+            .trim();
+          parsed = JSON.parse(cleaned);
+          successfulStrategy = 'CONTENT_CLEANING';
+          console.log('✅ JSON parse succeeded via [CONTENT_CLEANING]');
+          console.log('📦 Cleaned content length:', cleaned.length);
+        } catch (cleanError) {
+          jsonExtractionAttempts++;
+          console.log('⚠️  Strategy [CONTENT_CLEANING] failed:', (cleanError as Error).message.substring(0, 100));
+        }
+      }
+      
+      // Final fallback with detailed logging
+      if (!parsed) {
+        console.error('❌ ALL JSON EXTRACTION STRATEGIES FAILED');
+        console.error('📊 Extraction attempts made:', jsonExtractionAttempts);
+        console.error('📏 Raw content length:', content.length);
+        console.error('🔍 Content preview:', content.substring(0, 200));
+        console.error('🔍 Content ending:', content.substring(Math.max(0, content.length - 100)));
+        successfulStrategy = 'FALLBACK_EMPTY';
+        parsed = { contentBlocks: [] };
+      }
     }
 
     // Ensure we have an array to pass through the fixer
@@ -823,7 +1198,46 @@ IMPORTANT: Respond with valid JSON only. No markdown code blocks, no explanation
                   : Array.isArray(parsed)               ? parsed
                   : [];
 
-    const fixedBlocks = applyAutoFixes(blocks, request.schema);
+    console.log(`🔍 BLOCKS EXTRACTED: ${blocks.length} content blocks via [${successfulStrategy}]`);
+    if (blocks.length > 0) {
+      console.log('📋 First block preview:', {
+        _type: blocks[0]._type,
+        _key: blocks[0]._key,
+        fields: Object.keys(blocks[0]).filter(k => !k.startsWith('_')).length,
+        hasRequiredFields: blocks[0]._type && blocks[0]._key
+      });
+      console.log('📋 Block types found:', blocks.map((b: any) => b._type).join(', '));
+    } else {
+      console.warn('⚠️  No content blocks extracted - will trigger auto-fix system with empty array');
+    }
+
+    let fixedBlocks = applyAutoFixes(blocks, request.schema);
+    
+    // FAIL-SAFE: Ensure we never return completely empty content
+    if (!Array.isArray(fixedBlocks) || fixedBlocks.length === 0) {
+      console.warn('⚠️  Final contentBlocks array is empty after all fixes. Inserting fallback...');
+      console.warn('🔧 Creating emergency fallback content block');
+      
+      fixedBlocks = [{
+        _type: 'pageSection',
+        _key: `fallback-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
+        title: 'Indhold ikke genereret',
+        content: [{
+          _type: 'block',
+          _key: `block-${Date.now()}-${Math.random().toString(36).slice(2,4)}`,
+          style: 'normal',
+          children: [{
+            _type: 'span',
+            _key: `span-${Date.now()}-${Math.random().toString(36).slice(2,4)}`,
+            text: 'AI-indholdet kunne ikke genereres korrekt. Prøv venligst igen med en anden model eller justér dine indstillinger.',
+            marks: []
+          }],
+          markDefs: []
+        }]
+      }];
+      
+      console.log('✅ Emergency fallback content created - user will see helpful message instead of empty page');
+    }
     
     // Debug the fixes
     console.log('🔍 POST-FIX DEBUGGING:');
