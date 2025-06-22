@@ -1,0 +1,245 @@
+{
+  "contentBlockTypes": [
+    {
+      "type": "hero",
+      "requiredFields": [
+        "headline",
+        "subheadline"
+      ],
+      "optionalFields": [
+        "image"
+      ],
+      "fieldTypes": {
+        "headline": "string",
+        "subheadline": "string",
+        "image": "image?"
+      },
+      "description": "Top of page section with prominent heading and intro text"
+    },
+    {
+      "type": "pageSection",
+      "requiredFields": [
+        "title",
+        "content"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "content": "array of Portable Text blocks"
+      },
+      "linkMarkDef": true,
+      "description": "Main content area with portable text"
+    },
+    {
+      "type": "featureList",
+      "requiredFields": [
+        "title",
+        "features"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "features": "array of feature objects"
+      },
+      "description": "List of features showing how ElPortal works"
+    },
+    {
+      "type": "featureItem",
+      "requiredFields": [
+        "title",
+        "description"
+      ],
+      "optionalFields": [
+        "icon"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "description": "string",
+        "icon": "icon.manager?"
+      },
+      "description": "Icon is optional - let users pick manually in Studio"
+    },
+    {
+      "type": "valueProposition",
+      "requiredFields": [
+        "title",
+        "propositions"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "propositions": "array of strings"
+      },
+      "description": "Value propositions listed as plain strings, not blocks."
+    },
+    {
+      "type": "providerList",
+      "requiredFields": [
+        "title",
+        "providers"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "providers": "array of references"
+      },
+      "description": "Array of provider product references – first ref MUST be Vindstød"
+    },
+    {
+      "type": "livePriceGraph",
+      "requiredFields": [
+        "title",
+        "subtitle",
+        "apiRegion"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "subtitle": "string",
+        "apiRegion": "string"
+      },
+      "fieldEnums": {
+        "apiRegion": ["DK1", "DK2"]
+      },
+      "description": "Graph for showing live prices. apiRegion must be 'DK1' or 'DK2'"
+    },
+    {
+      "type": "renewableEnergyForecast",
+      "requiredFields": [
+        "title",
+        "leadingText"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "leadingText": "string"
+      },
+      "description": "Forecast of solar and wind production"
+    },
+    {
+      "type": "priceExampleTable",
+      "requiredFields": [
+        "title",
+        "leadingText",
+        "example1_title",
+        "example1_kwh_price",
+        "example1_subscription",
+        "example2_title",
+        "example2_kwh_price",
+        "example2_subscription"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "leadingText": "array of Portable Text blocks",
+        "example1_title": "string",
+        "example1_kwh_price": "number",
+        "example1_subscription": "number",
+        "example2_title": "string",
+        "example2_kwh_price": "number",
+        "example2_subscription": "number"
+      },
+      "description": "Table comparing two price offers. 'leadingText' must be block[] (Portable Text)."
+    },
+    {
+      "type": "videoSection",
+      "requiredFields": [
+        "title",
+        "videoUrl"
+      ],
+      "optionalFields": [
+        "customThumbnail"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "videoUrl": "string",
+        "customThumbnail": "image?"
+      },
+      "description": "Video section with thumbnail. Thumbnail must be a valid Sanity image with asset._ref"
+    },
+    {
+      "type": "monthlyProductionChart",
+      "requiredFields": [
+        "title",
+        "leadingText",
+        "description"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "leadingText": "string",
+        "description": "string"
+      },
+      "description": "Chart showing production over past 12 months"
+    },
+    {
+      "type": "faqGroup",
+      "requiredFields": [
+        "title",
+        "faqItems"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "faqItems": "array of FAQ item references"
+      },
+      "description": "Container for a list of FAQ items"
+    },
+    {
+      "type": "faqItem",
+      "requiredFields": [
+        "question",
+        "answer"
+      ],
+      "fieldTypes": {
+        "question": "string",
+        "answer": "array of Portable Text blocks"
+      },
+      "description": "Single FAQ with answer in portable text"
+    },
+    {
+      "type": "callToActionSection",
+      "requiredFields": [
+        "title",
+        "buttonText",
+        "buttonUrl"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "buttonText": "string",
+        "buttonUrl": "string"
+      },
+      "description": "Bottom page call-to-action block"
+    },
+    {
+      "type": "heroWithCalculator",
+      "requiredFields": [],
+      "fieldTypes": {
+        "title": "string",
+        "subtitle": "string",
+        "stats": "array of stat objects"
+      },
+      "description": "Hero section with integrated price calculator – combines headline, subtitle, and stats"
+    },
+    {
+      "type": "priceCalculator",
+      "requiredFields": [],
+      "fieldTypes": {
+        "title": "string"
+      },
+      "description": "Interactive price calculator widget"
+    },
+    {
+      "type": "richTextSection",
+      "requiredFields": [
+        "content"
+      ],
+      "fieldTypes": {
+        "content": "array of Portable Text blocks"
+      },
+      "description": "Standalone rich text content section"
+    },
+    {
+      "type": "realPriceComparisonTable",
+      "requiredFields": [
+        "title"
+      ],
+      "fieldTypes": {
+        "title": "string",
+        "leadingText": "string"
+      },
+      "description": "Live table with pricing per provider"
+    }
+  ]
+}

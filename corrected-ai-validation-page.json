@@ -1,0 +1,495 @@
+{
+  "_createdAt": "2025-06-22T11:25:47Z",
+  "_id": "5d7c2c09-d3c3-44b6-aafb-1d4f66417534",
+  "_rev": "mSkCbxUwGcv6uYz7ge7rLe",
+  "_system": {
+    "base": {
+      "id": "5d7c2c09-d3c3-44b6-aafb-1d4f66417534",
+      "rev": "mSkCbxUwGcv6uYz7ge7pMA"
+    }
+  },
+  "_type": "page",
+  "_updatedAt": "2025-06-22T11:35:11.396Z",
+  "contentBlocks": [
+    {
+      "_key": "3c8a4c8c516b",
+      "_type": "hero",
+      "cta": {
+        "link": "https://elportal-forside-design.vercel.app/",
+        "text": "Get Started Today"
+      },
+      "headline": "AI Validation Test Page - All Components",
+      "images": [
+        {
+          "_key": "53d787caef46",
+          "_type": "image",
+          "asset": {
+            "_ref": "image-7be15ec9534513618b3540805be193c764522694-5364x3576-jpg",
+            "_type": "reference"
+          },
+          "alt": "Hero image showing electricity price comparison interface"
+        }
+      ],
+      "subheadline": "This comprehensive test page contains every supported content block type to validate schema compliance and ensure all components render correctly. Use this page to catch issues early in development."
+    },
+    {
+      "_key": "64e1eb39a261",
+      "_type": "callToActionSection",
+      "buttonText": "Compare Electricity Prices",
+      "buttonUrl": "/price-comparison",
+      "title": "Ready to Save on Your Electricity Bill?"
+    },
+    {
+      "_key": "c64782fb1cc6",
+      "_type": "faqGroup",
+      "faqItems": [
+        {
+          "_key": "6219f956e51e",
+          "_type": "faqItem",
+          "answer": [
+            {
+              "_key": "35d59d3bde0b",
+              "_type": "block",
+              "children": [
+                {
+                  "_key": "633e303d631a",
+                  "_type": "span",
+                  "marks": [],
+                  "text": "Our platform compares electricity prices from all major Danish providers in real-time. We analyze current market rates, subscription fees, and additional costs to help you find the best deal for your specific usage pattern."
+                }
+              ],
+              "markDefs": [],
+              "style": "normal"
+            }
+          ],
+          "question": "How does the electricity price comparison work?"
+        },
+        {
+          "_key": "aef14fc864e76b28dccf41785dd9d8d1",
+          "_type": "faqItem",
+          "answer": [
+            {
+              "_key": "35d59d3bde0b2",
+              "_type": "block",
+              "children": [
+                {
+                  "_key": "633e303d631a2",
+                  "_type": "span",
+                  "marks": [],
+                  "text": "We update our price data multiple times daily directly from provider APIs and official sources. This ensures you always see the most current rates and can make informed decisions based on real-time market conditions."
+                }
+              ],
+              "markDefs": [],
+              "style": "normal"
+            }
+          ],
+          "question": "How often are electricity prices updated?"
+        },
+        {
+          "_key": "96a92653acc34557ce7d440a937d8bdf",
+          "_type": "faqItem",
+          "answer": [
+            {
+              "_key": "35d59d3bde0b3",
+              "_type": "block",
+              "children": [
+                {
+                  "_key": "633e303d631a3",
+                  "_type": "span",
+                  "marks": [],
+                  "text": "Yes, our service is completely free for consumers. We earn revenue through partnerships with electricity providers, but this never affects our price comparisons or recommendations - we always show you the most competitive rates available."
+                }
+              ],
+              "markDefs": [],
+              "style": "normal"
+            }
+          ],
+          "question": "Is the price comparison service free to use?"
+        }
+      ],
+      "title": "Frequently Asked Questions"
+    },
+    {
+      "_key": "53de17b73286",
+      "_type": "featureList",
+      "features": [
+        {
+          "_key": "44df6f326ed5",
+          "_type": "featureItem",
+          "description": "Compare real-time electricity prices from all major Danish providers. Our advanced algorithms analyze market rates, subscription fees, and additional costs to find the best deal for your specific usage pattern.",
+          "title": "Real-Time Price Comparison",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiZap",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiZap.svg"
+            }
+          }
+        },
+        {
+          "_key": "7967ece77ee3d0a4cd23be71639f88ce",
+          "_type": "featureItem",
+          "description": "Track renewable energy production forecasts and optimize your electricity usage during green energy peaks. Support Denmark's transition to sustainable energy while saving money on your electricity bill.",
+          "title": "Green Energy Optimization",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiLeaf",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiLeaf.svg"
+            }
+          }
+        },
+        {
+          "_key": "a0b13f8243d0e9ca4f39872b4afe4d41",
+          "_type": "featureItem",
+          "description": "Use our interactive calculator to estimate your monthly electricity costs based on your actual usage patterns. Get personalized recommendations and see potential savings from switching providers.",
+          "title": "Smart Cost Calculator",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiCalculator",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiCalculator.svg"
+            }
+          }
+        }
+      ],
+      "title": "Key Features"
+    },
+    {
+      "_key": "f5e193349693",
+      "_type": "heroWithCalculator",
+      "stats": [
+        {
+          "_key": "e726e8f435a8",
+          "_type": "statItem",
+          "label": "Active Users",
+          "value": "25,000+"
+        },
+        {
+          "_key": "da1ffcf5f625f99484ae7f1b92a83794",
+          "_type": "statItem",
+          "label": "Annual Savings",
+          "value": "€2.5M"
+        },
+        {
+          "_key": "534591bbd82194d6ebdd306f14738e06",
+          "_type": "statItem",
+          "label": "Provider Partners",
+          "value": "50+"
+        }
+      ],
+      "subtitle": "Join thousands of Danish households who have already switched to better electricity deals. Our platform has helped users save over €2.5 million annually on their electricity bills through smart provider comparison and optimization.",
+      "title": "Denmark's Leading Electricity Price Comparison Platform"
+    },
+    {
+      "_key": "3476bcc4a347",
+      "_type": "livePriceGraph",
+      "apiRegion": "DK1",
+      "subtitle": "Real-time electricity spot prices for the DK1 region",
+      "title": "Live Electricity Prices - Western Denmark"
+    },
+    {
+      "_key": "4f1c4274a0b2",
+      "_type": "monthlyProductionChart",
+      "description": "This chart shows the projected monthly renewable energy production capacity across Denmark, helping you understand the best times to consume electricity from clean sources.",
+      "leadingText": "Denmark is a global leader in renewable energy adoption, with wind and solar power making up an increasing share of our electricity production throughout the year.",
+      "title": "Monthly Renewable Energy Production Forecast"
+    },
+    {
+      "_key": "aa75583d6ebe",
+      "_type": "pageSection",
+      "content": [
+        {
+          "_key": "d683309b53b6",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "2cba0a65f727",
+              "_type": "span",
+              "marks": [],
+              "text": "Understanding the Danish electricity market can be complex, with multiple pricing models, subscription types, and additional fees to consider. Our platform simplifies this process by providing clear, comparable data across all major providers, helping you make informed decisions about your energy supply."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ],
+      "settings": {
+        "_type": "sectionSettings",
+        "fullWidth": false,
+        "padding": "large",
+        "theme": "light"
+      },
+      "title": "Understanding Danish Electricity Markets"
+    },
+    {
+      "_key": "6592cdbd567a",
+      "_type": "priceCalculator",
+      "title": "Calculate Your Potential Savings",
+      "description": "Enter your electricity usage details to see personalized provider recommendations and potential savings",
+      "settings": {
+        "defaultUsage": 4000,
+        "showAdvancedOptions": true,
+        "includeGreenOptions": true,
+        "region": "DK1"
+      }
+    },
+    {
+      "_key": "63585a7b29f6",
+      "_type": "priceExampleTable",
+      "example1_kwh_price": 2.2,
+      "example1_subscription": 29,
+      "example1_title": "Traditional Provider Example",
+      "example2_kwh_price": 1.95,
+      "example2_subscription": 25,
+      "example2_title": "Optimized Green Energy Deal",
+      "leadingText": [
+        {
+          "_key": "8b02b2fb1c65",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "1a0171fe3c63",
+              "_type": "span",
+              "marks": [],
+              "text": "Compare typical electricity costs between traditional providers and optimized green energy deals. These examples show real pricing scenarios for average Danish households with 4,000 kWh annual consumption."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ],
+      "note": "Prices shown include VAT and all fees. Actual savings may vary based on your specific usage pattern and chosen provider.",
+      "title": "Price Comparison Examples"
+    },
+    {
+      "_key": "11f3dfae0744",
+      "_type": "providerList",
+      "providers": [
+        {
+          "_key": "b432293963bb",
+          "_ref": "63c05ca2-cd1e-4f00-b544-6a2077d4031a",
+          "_type": "reference"
+        },
+        {
+          "_key": "13562fae9e17",
+          "_ref": "a6541984-3dbb-466a-975b-badba029e139",
+          "_type": "reference"
+        },
+        {
+          "_key": "e4754f80d093",
+          "_ref": "9451a43b-6e68-4914-945c-73a81a508214",
+          "_type": "reference"
+        },
+        {
+          "_key": "685d7538a065",
+          "_ref": "9526e0ba-cbe8-4526-9abc-7dabb4756b2b",
+          "_type": "reference"
+        }
+      ],
+      "title": "Featured Electricity Providers"
+    },
+    {
+      "_key": "995c95db3711",
+      "_type": "realPriceComparisonTable",
+      "leadingText": "This live comparison table shows current electricity prices from major Danish providers, updated multiple times daily. Prices include VAT and all mandatory fees for accurate comparison.",
+      "title": "Live Price Comparison Table",
+      "allProviders": [
+        {
+          "id": "provider-1",
+          "providerName": "Ørsted",
+          "productName": "El Klassisk",
+          "logoUrl": "https://example.com/logos/orsted.png",
+          "displayPrice_kWh": 2.15,
+          "displayMonthlyFee": 29,
+          "signupLink": "https://orsted.dk/privat",
+          "isVindstoedProduct": false,
+          "benefits": [
+            {
+              "text": "24/7 customer support",
+              "included": true
+            },
+            {
+              "text": "Green energy option",
+              "included": true
+            }
+          ]
+        },
+        {
+          "id": "provider-2",
+          "providerName": "Vattenfall",
+          "productName": "Naturgas+",
+          "logoUrl": "https://example.com/logos/vattenfall.png",
+          "displayPrice_kWh": 2.08,
+          "displayMonthlyFee": 25,
+          "signupLink": "https://vattenfall.dk",
+          "isVindstoedProduct": true,
+          "benefits": [
+            {
+              "text": "100% renewable energy",
+              "included": true
+            },
+            {
+              "text": "Fixed price guarantee",
+              "included": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "d19abcea7479",
+      "_type": "renewableEnergyForecast",
+      "leadingText": "Track renewable energy production forecasts across Denmark. Plan your electricity usage during peak renewable production periods to maximize your contribution to sustainable energy consumption.",
+      "title": "Renewable Energy Production Forecast"
+    },
+    {
+      "_key": "4cf347e382c5",
+      "_type": "richTextSection",
+      "content": [
+        {
+          "_key": "ca024e99d333",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "7bf606b5cfb8",
+              "_type": "span",
+              "marks": ["strong"],
+              "text": "The Danish electricity market has undergone significant deregulation"
+            },
+            {
+              "_key": "7bf606b5cfb9",
+              "_type": "span",
+              "marks": [],
+              "text": ", allowing consumers to choose from a wide variety of providers and pricing models. This competitive environment has led to better prices and more innovative services for consumers."
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        },
+        {
+          "_key": "ca024e99d334",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "7bf606b5cfb10",
+              "_type": "span",
+              "marks": [],
+              "text": "Understanding the different pricing structures is crucial for making an informed decision:"
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        },
+        {
+          "_key": "ca024e99d335",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "7bf606b5cfb11",
+              "_type": "span",
+              "marks": [],
+              "text": "• Fixed-price contracts offer stability and predictable monthly bills"
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        },
+        {
+          "_key": "ca024e99d336",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "7bf606b5cfb12",
+              "_type": "span",
+              "marks": [],
+              "text": "• Variable-rate plans can offer savings during low-demand periods"
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        },
+        {
+          "_key": "ca024e99d337",
+          "_type": "block",
+          "children": [
+            {
+              "_key": "7bf606b5cfb13",
+              "_type": "span",
+              "marks": [],
+              "text": "• Green energy options support Denmark's renewable energy goals"
+            }
+          ],
+          "markDefs": [],
+          "style": "normal"
+        }
+      ]
+    },
+    {
+      "_key": "5bbe31ad0009",
+      "_type": "valueProposition",
+      "items": [
+        {
+          "_key": "96f0fbfe4082",
+          "_type": "valueItem",
+          "text": "Save up to 30% on your annual electricity bill",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiCheck",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiCheck.svg"
+            }
+          }
+        },
+        {
+          "_key": "60039b1545bc586da3e37968538dc3af",
+          "_type": "valueItem",
+          "text": "Access to 100% renewable energy options",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiCheck",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiCheck.svg"
+            }
+          }
+        },
+        {
+          "_key": "8de2b48edddba2def3ab30c0f3ea8f4f",
+          "_type": "valueItem",
+          "text": "Free switching service with no hidden fees",
+          "icon": {
+            "_type": "icon.manager",
+            "icon": "FiCheck",
+            "metadata": {
+              "url": "https://cdn.sanity.io/icons/fi/FiCheck.svg"
+            }
+          }
+        }
+      ],
+      "title": "Why Choose Our Platform"
+    },
+    {
+      "_key": "fecd37e5459b",
+      "_type": "videoSection",
+      "title": "How to Use Our Price Calculator",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "customThumbnail": {
+        "_type": "image",
+        "asset": {
+          "_ref": "image-7be15ec9534513618b3540805be193c764522694-5364x3576-jpg",
+          "_type": "reference"
+        },
+        "alt": "Video thumbnail showing price calculator interface tutorial"
+      }
+    }
+  ],
+  "seo": {
+    "description": "Comprehensive test page containing all ElPortal content block types for validation and testing purposes. Includes examples of hero sections, calculators, price comparisons, and more.",
+    "title": "AI Validation Test Page - All Content Blocks | ElPortal"
+  },
+  "slug": {
+    "_type": "slug",
+    "current": "ai-validation-page"
+  },
+  "title": "AI Validation Page - Complete Content Block Test"
+} 

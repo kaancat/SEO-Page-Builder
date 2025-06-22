@@ -1,0 +1,53 @@
+{
+  "name": "seo-page-generator",
+  "version": "0.1.0",
+  "description": "Internal tool for generating structured SEO content for Sanity CMS",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/file-saver": "^2.0.0",
+    "@types/jszip": "^3.4.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.0",
+    "autoprefixer": "^10.4.0",
+    "axios": "^1.6.0",
+    "clsx": "^2.0.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.0",
+    "next": "^14.0.0",
+    "postcss": "^8.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0"
+  },
+  "keywords": [
+    "seo",
+    "content-generation",
+    "sanity-cms",
+    "elportal",
+    "programmatic-seo"
+  ],
+  "author": "ElPortal Development Team",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
